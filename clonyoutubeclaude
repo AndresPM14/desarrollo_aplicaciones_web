@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #212121;
+    --surface2: #272727;
+    --border: #3f3f3f;
+    --text: #f1f1f1;
+    --text-muted: #aaa;
+    --red: #ff0000;
+    --chip-bg: #3f3f3f;
+    --chip-active: #f1f1f1;
+    --chip-active-text: #0f0f0f;
+    --sidebar-w: 240px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* ── TOPBAR ── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 16px; }
+
+  .menu-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+    cursor: pointer; background: none; border: none; padding: 8px;
+  }
+  .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 1px; }
+
+  .logo { display: flex; align-items: center; gap: 2px; text-decoration: none; }
+  .logo svg { height: 20px; }
+  .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); margin-left: 4px; }
+  .logo-text span { color: var(--text-muted); font-weight: 400; font-size: 11px; vertical-align: super; margin-left: 1px; }
+
+  .search-area { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 640px; margin: 0 40px; }
+
+  .search-bar {
+    flex: 1; display: flex; align-items: center;
+    border: 1px solid var(--border); border-radius: 40px 0 0 40px;
+    overflow: hidden;
+  }
+  .search-bar input {
+    flex: 1; padding: 8px 16px; background: var(--bg);
+    border: none; outline: none; color: var(--text); font-size: 16px;
+  }
+  .search-bar input::placeholder { color: var(--text-muted); }
+
+  .search-btn {
+    width: 64px; height: 40px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: none; border-radius: 0 40px 40px 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  .search-btn:hover { background: var(--surface2); }
+
+  .mic-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--surface2); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 8px; }
+
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text); position: relative;
+  }
+  .icon-btn:hover { background: var(--surface2); }
+
+  .badge {
+    position: absolute; top: 4px; right: 4px;
+    background: var(--red); color: #fff;
+    font-size: 10px; font-weight: 700;
+    width: 16px; height: 16px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .sign-in-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid #3ea6ff; background: none;
+    color: #3ea6ff; font-size: 14px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .sign-in-btn:hover { background: rgba(62,166,255,0.1); }
+
+  /* ── SIDEBAR ── */
+  aside {
+    position: fixed; top: 56px; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--bg);
+    overflow-y: auto; overflow-x: hidden;
+    padding: 12px 0;
+    z-index: 90;
+  }
+  aside::-webkit-scrollbar { width: 4px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .sidebar-item {
+    display: flex; align-items: center; gap: 24px;
+    padding: 0 24px; height: 40px;
+    border-radius: 10px; margin: 0 4px;
+    cursor: pointer; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .sidebar-item:hover { background: var(--surface2); }
+  .sidebar-item.active { background: var(--surface); font-weight: 600; }
+  .sidebar-item svg { flex-shrink: 0; }
+  .sidebar-item span { font-size: 14px; }
+
+  .sidebar-divider {
+    height: 1px; background: var(--border);
+    margin: 12px 0;
+  }
+
+  .sidebar-section-title {
+    padding: 8px 24px; font-size: 14px; font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ── MAIN ── */
+  main {
+    margin-left: var(--sidebar-w);
+    margin-top: 56px;
+    padding: 0 24px 40px;
+  }
+
+  /* ── CHIPS ── */
+  .chips-bar {
+    position: sticky; top: 56px; z-index: 80;
+    background: var(--bg);
+    display: flex; gap: 12px; overflow-x: auto;
+    padding: 12px 0;
+    scrollbar-width: none;
+  }
+  .chips-bar::-webkit-scrollbar { display: none; }
+
+  .chip {
+    padding: 6px 14px; border-radius: 8px;
+    background: var(--chip-bg); border: none;
+    color: var(--text); font-size: 14px;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .chip:hover { background: #4f4f4f; }
+  .chip.active {
+    background: var(--chip-active);
+    color: var(--chip-active-text);
+    font-weight: 600;
+  }
+
+  /* ── GRID ── */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px 16px;
+    margin-top: 8px;
+  }
+
+  .video-card { cursor: pointer; }
+
+  .thumbnail-wrap {
+    position: relative;
+    width: 100%; aspect-ratio: 16/9;
+    border-radius: 12px; overflow: hidden;
+    background: var(--surface);
+  }
+  .thumbnail-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .video-card:hover .thumbnail-wrap img { transform: scale(1.03); }
+
+  .duration {
+    position: absolute; bottom: 6px; right: 6px;
+    background: rgba(0,0,0,0.85); color: #fff;
+    font-size: 12px; font-weight: 600; padding: 2px 5px;
+    border-radius: 4px;
+  }
+
+  .progress-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: rgba(255,255,255,0.3);
+  }
+  .progress-bar span {
+    display: block; height: 100%; background: var(--red);
+  }
+
+  .video-info {
+    display: flex; gap: 12px;
+    padding: 10px 4px 0;
+  }
+
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    background: var(--surface2);
+  }
+
+  .video-meta { flex: 1; min-width: 0; }
+  .video-title {
+    font-size: 14px; font-weight: 600; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; color: var(--text);
+  }
+  .channel-name {
+    color: var(--text-muted); font-size: 13px; margin-top: 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .verified {
+    width: 12px; height: 12px; background: var(--text-muted);
+    border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .verified::after { content: '✓'; font-size: 8px; color: var(--bg); font-weight: 700; }
+  .video-stats { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+  .more-btn {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; padding: 4px; border-radius: 50%;
+    opacity: 0; transition: opacity 0.15s;
+    align-self: flex-start; margin-top: -2px;
+    width: 24px; height: 24px;
+  }
+  .video-card:hover .more-btn { opacity: 1; }
+
+  /* ── SHORTS ROW ── */
+  .section-title { font-size: 18px; font-weight: 700; margin: 24px 0 12px; }
+
+  .shorts-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .short-card { cursor: pointer; }
+  .short-thumb {
+    aspect-ratio: 9/16;
+    border-radius: 12px; overflow: hidden;
+    background: var(--surface);
+    position: relative;
+  }
+  .short-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+  .short-card:hover .short-thumb img { transform: scale(1.04); }
+  .short-title {
+    font-size: 14px; font-weight: 600; margin: 8px 4px 2px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .short-views { font-size: 13px; color: var(--text-muted); margin: 0 4px; }
+  .short-badge {
+    position: absolute; bottom: 8px; left: 8px;
+    background: #ff0000; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* ── SVG ICONS ── */
+  svg { fill: currentColor; }
+
+  @media (max-width: 1200px) {
+    .video-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  }
+  @media (max-width: 900px) {
+    aside { display: none; }
+    main { margin-left: 0; }
+  }
+  @media (max-width: 600px) {
+    .search-area { margin: 0 12px; }
+    .video-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-left">
+    <button class="menu-btn">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="#" class="logo">
+      <!-- YouTube logo SVG -->
+      <svg width="90" height="20" viewBox="0 0 90 20">
+        <g>
+          <path d="M27.97 3.43c-.32-1.2-1.27-2.14-2.47-2.46C23.3.4 14.5.4 14.5.4s-8.8 0-11 .57C2.3 1.29 1.35 2.23 1.03 3.43.46 5.63.46 10.2.46 10.2s0 4.57.57 6.77c.32 1.2 1.27 2.14 2.47 2.46 2.2.57 11 .57 11 .57s8.8 0 11-.57c1.2-.32 2.15-1.26 2.47-2.46.57-2.2.57-6.77.57-6.77s0-4.57-.57-6.77z" fill="#FF0000"/>
+          <polygon points="11.7,14.2 19.1,10.2 11.7,6.2" fill="#fff"/>
+          <text x="31" y="15" font-family="Arial,sans-serif" font-size="16" font-weight="bold" fill="#f1f1f1">YouTube</text>
+        </g>
+      </svg>
+    </a>
+  </div>
+
+  <div class="search-area">
+    <div class="search-bar">
+      <input type="text" placeholder="Buscar">
+    </div>
+    <button class="search-btn" title="Buscar">
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M21.71 20.29l-5.01-5.01A8 8 0 1 0 15.7 16.7l5.01 5.01a1 1 0 0 0 1.41-1.42zM10 16a6 6 0 1 1 0-12 6 6 0 0 1 0 12z"/></svg>
+    </button>
+    <button class="mic-btn" title="Buscar con tu voz">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 9v-2a7 7 0 0 1-7-7H3a9 9 0 0 0 18 0h-2a7 7 0 0 1-7 7v2h2v2h-4v-2h2z"/></svg>
+    </button>
+  </div>
+
+  <div class="header-right">
+    <button class="icon-btn" title="Crear">
+      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2zm3-7H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 14H3V8h14v12zm4-16v15h-2V4H5V2h16c1.1 0 2 .9 2 2z"/></svg>
+    </button>
+    <button class="icon-btn" title="Notificaciones">
+      <svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      <span class="badge">9</span>
+    </button>
+    <button class="sign-in-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#3ea6ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+      Acceder
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside>
+  <a href="#" class="sidebar-item active">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    <span>Inicio</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+    <span>Shorts</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg>
+    <span>Suscripciones</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section-title">Tú &rsaquo;</div>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+    <span>Tu canal</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M15 8v8H5V8h10zm1-2H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4V7c0-.55-.45-1-1-1z"/></svg>
+    <span>Historial</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zm-7-1l-3-3.75 2.1-2.58 1.5 1.83L16 8l2 2.5-5 4.5z"/></svg>
+    <span>Listas</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+    <span>Tus videos</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section-title">Explorar</div>
+
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/></svg>
+    <span>Tendencias</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>
+    <span>Música</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 6.5C21 4.01 18.99 2 16.5 2s-4.5 2.01-4.5 4.5c0 2.33 1.77 4.25 4.04 4.48C15.36 13.5 14.06 15 12 15c-2.21 0-4 1.79-4 4v1H6v2h12v-2h-2v-1c0-1.49-.61-2.84-1.6-3.82C16.22 14.82 21 11.18 21 6.5zm-4.5 3C14.57 9.5 13 7.93 13 6s1.57-3.5 3.5-3.5S20 4.07 20 6s-1.57 3.5-3.5 3.5z"/></svg>
+    <span>Deportes</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M21 3H3v16h5v2h8v-2h5V3zm-2 14H5V5h14v12z"/></svg>
+    <span>En vivo</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    <span>Gaming</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+    <span>Noticias</span>
+  </a>
+
+  <div class="sidebar-divider"></div>
+
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+    <span>Configuración</span>
+  </a>
+  <a href="#" class="sidebar-item">
+    <svg width="24" height="24" viewBox="0 0 24 24"><path d="M14.5 2.5c0 1.5-1.5 7-1.5 7h-2S9.5 4 9.5 2.5a2.5 2.5 0 0 1 5 0zM12 17c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm1-4.32V11h-2v1.68c-2.33.43-4 2.46-4 4.82h10c0-2.36-1.67-4.39-4-4.82z"/></svg>
+    <span>Informar un error</span>
+  </a>
+</aside>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<main>
+
+  <!-- CHIPS -->
+  <div class="chips-bar">
+    <button class="chip active">Todos</button>
+    <button class="chip">Música</button>
+    <button class="chip">JavaScript</button>
+    <button class="chip">Programación</button>
+    <button class="chip">Gaming</button>
+    <button class="chip">Deportes en vivo</button>
+    <button class="chip">Recientemente subidos</button>
+    <button class="chip">Ver más tarde</button>
+    <button class="chip">Nuevos para ti</button>
+    <button class="chip">Películas</button>
+    <button class="chip">Tutoriales</button>
+    <button class="chip">Cocina</button>
+    <button class="chip">React</button>
+    <button class="chip">Design</button>
+    <button class="chip">Python</button>
+    <button class="chip">Noticias</button>
+    <button class="chip">Viajes</button>
+    <button class="chip">Fitness</button>
+  </div>
+
+  <!-- SHORTS SECTION -->
+  <h2 class="section-title">
+    <svg width="20" height="20" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:6px;fill:#f1f1f1"><path d="M17.77 10.32l-1.2-.5L18 9l.5-1.2.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2zM5 9l.5-1.2L6 9l1.2.5L6 10l-.5 1.2-.5-1.2-1.2-.5L5 9zm5.69-4.93l.61 1.47 1.47.61-1.47.61-.61 1.47-.61-1.47-1.47-.61 1.47-.61.61-1.47zM3 13h18v2H3v-2zm0 4h18v2H3v-2z"/></svg>
+    Shorts
+  </h2>
+  <div class="shorts-row">
+
+    <div class="short-card">
+      <div class="short-thumb">
+        <img src="https://picsum.photos/seed/s1/270/480" alt="Short 1">
+        <span class="short-badge">▶ Shorts</span>
+      </div>
+      <div class="short-title">Aprende CSS Grid en 60 segundos 🔥</div>
+      <div class="short-views">2.3M vistas</div>
+    </div>
+
+    <div class="short-card">
+      <div class="short-thumb">
+        <img src="https://picsum.photos/seed/s2/270/480" alt="Short 2">
+        <span class="short-badge">▶ Shorts</span>
+      </div>
+      <div class="short-title">Este truco de Python te va a volar la cabeza</div>
+      <div class="short-views">1.8M vistas</div>
+    </div>
+
+    <div class="short-card">
+      <div class="short-thumb">
+        <img src="https://picsum.photos/seed/s3/270/480" alt="Short 3">
+        <span class="short-badge">▶ Shorts</span>
+      </div>
+      <div class="short-title">Receta viral de pasta carbonara italiana</div>
+      <div class="short-views">5.1M vistas</div>
+    </div>
+
+    <div class="short-card">
+      <div class="short-thumb">
+        <img src="https://picsum.photos/seed/s4/270/480" alt="Short 4">
+        <span class="short-badge">▶ Shorts</span>
+      </div>
+      <div class="short-title">El gol del siglo - momento imperdible ⚽</div>
+      <div class="short-views">8.9M vistas</div>
+    </div>
+
+    <div class="short-card">
+      <div class="short-thumb">
+        <img src="https://picsum.photos/seed/s5/270/480" alt="Short 5">
+        <span class="short-badge">▶ Shorts</span>
+      </div>
+      <div class="short-title">La IA que está cambiando todo en 2025</div>
+      <div class="short-views">3.4M vistas</div>
+    </div>
+
+  </div>
+
+  <!-- VIDEO GRID -->
+  <div class="video-grid" style="margin-top:32px">
+
+    <!-- Card 1 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v1/480/270" alt="">
+        <span class="duration">14:23</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a1/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Cómo construir una app Full Stack con React y Node.js desde cero</div>
+          <div class="channel-name">Midudev <span class="verified"></span></div>
+          <div class="video-stats">1.2M vistas · hace 3 días</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v2/480/270" alt="">
+        <span class="duration">8:45</span>
+        <div class="progress-bar"><span style="width:60%"></span></div>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a2/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Los mejores destinos de viaje para 2025 - Europa en 30 días</div>
+          <div class="channel-name">Travel Vibes</div>
+          <div class="video-stats">890K vistas · hace 1 semana</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v3/480/270" alt="">
+        <span class="duration">22:17</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a3/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Machine Learning para principiantes - Todo lo que necesitas saber</div>
+          <div class="channel-name">Dot CSV <span class="verified"></span></div>
+          <div class="video-stats">2.1M vistas · hace 2 semanas</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v4/480/270" alt="">
+        <span class="duration">35:02</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a4/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Champions League Highlights - Semifinal ¡Goles increíbles!</div>
+          <div class="channel-name">UEFA Champions <span class="verified"></span></div>
+          <div class="video-stats">5.7M vistas · hace 1 día</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v5/480/270" alt="">
+        <span class="duration">1:02:44</span>
+        <div class="progress-bar"><span style="width:25%"></span></div>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a5/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Concierto completo - Bad Bunny World Tour 2025 en vivo</div>
+          <div class="channel-name">BadBunnyVEVO <span class="verified"></span></div>
+          <div class="video-stats">12M vistas · hace 5 días</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v6/480/270" alt="">
+        <span class="duration">18:30</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a6/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Guía definitiva de Tailwind CSS - De cero a experto</div>
+          <div class="channel-name">Hola Mundo</div>
+          <div class="video-stats">450K vistas · hace 1 mes</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v7/480/270" alt="">
+        <span class="duration">11:08</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a7/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Recetas saludables para toda la semana - Meal prep fácil</div>
+          <div class="channel-name">Come Sano</div>
+          <div class="video-stats">780K vistas · hace 3 semanas</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v8/480/270" alt="">
+        <span class="duration">28:15</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a8/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Historia del Imperio Romano - Documental completo en español</div>
+          <div class="channel-name">Historia 2.0 <span class="verified"></span></div>
+          <div class="video-stats">3.3M vistas · hace 6 meses</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v9/480/270" alt="">
+        <span class="duration">7:52</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a9/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Top 10 Jugadas de la NBA esta semana - Increíbles Highlights 🏀</div>
+          <div class="channel-name">NBA Español <span class="verified"></span></div>
+          <div class="video-stats">1.5M vistas · hace 2 días</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 10 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v10/480/270" alt="">
+        <span class="duration">45:30</span>
+        <div class="progress-bar"><span style="width:80%"></span></div>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a10/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Minecraft Hardcore - Sobreviviendo 100 días en el modo más difícil</div>
+          <div class="channel-name">GamingPro</div>
+          <div class="video-stats">6.2M vistas · hace 4 días</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 11 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v11/480/270" alt="">
+        <span class="duration">16:44</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a11/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">ChatGPT vs Claude vs Gemini - ¿Cuál es la mejor IA en 2025?</div>
+          <div class="channel-name">TechLatam <span class="verified"></span></div>
+          <div class="video-stats">2.8M vistas · hace 2 semanas</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+    <!-- Card 12 -->
+    <div class="video-card">
+      <div class="thumbnail-wrap">
+        <img src="https://picsum.photos/seed/v12/480/270" alt="">
+        <span class="duration">5:16</span>
+      </div>
+      <div class="video-info">
+        <img class="avatar" src="https://picsum.photos/seed/a12/36/36" alt="">
+        <div class="video-meta">
+          <div class="video-title">Aprende a meditar en 5 minutos - Mindfulness para principiantes</div>
+          <div class="channel-name">Mente Zen</div>
+          <div class="video-stats">320K vistas · hace 1 mes</div>
+        </div>
+        <button class="more-btn">⋮</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // Chips interactivity
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // Sidebar hover effect
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
