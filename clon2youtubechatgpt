@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YouTube</title>
+</head>
+
+<body style="margin:0; font-family:Roboto, Arial, sans-serif; background-color:#0f0f0f; color:white;">
+
+<!-- HEADER -->
+<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 20px; background-color:#0f0f0f; border-bottom:1px solid #222; position:sticky; top:0; z-index:1000;">
+
+    <!-- LEFT -->
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div style="font-size:22px; cursor:pointer;">☰</div>
+
+        <div style="display:flex; align-items:center; cursor:pointer;">
+            <div style="background-color:red; width:28px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center;">
+                <span style="color:white; font-size:12px;">▶</span>
+            </div>
+            <span style="font-size:20px; font-weight:600; margin-left:6px;">YouTube</span>
+        </div>
+    </div>
+
+    <!-- CENTER SEARCH -->
+    <div style="display:flex; align-items:center; width:40%;">
+
+        <input type="text" placeholder="Buscar"
+        style="flex:1; padding:10px 15px; background-color:#121212; border:1px solid #303030; color:white; border-radius:40px 0 0 40px; outline:none;">
+
+        <button style="padding:10px 20px; background-color:#222; border:1px solid #303030; color:white; border-radius:0 40px 40px 0;">
+            🔍
+        </button>
+
+        <div style="margin-left:10px; background-color:#222; padding:10px; border-radius:50%;">
+            🎤
+        </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div>📹</div>
+        <div>🔔</div>
+        <div style="width:34px; height:34px; background-color:#3ea6ff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; color:black;">
+            A
+        </div>
+    </div>
+
+</div>
+
+<!-- MAIN LAYOUT -->
+<div style="display:flex;">
+
+    <!-- SIDEBAR -->
+    <div style="width:230px; padding:15px; background-color:#0f0f0f;">
+
+        <div style="padding:10px; border-radius:10px; background-color:#272727;">🏠 Inicio</div>
+        <div style="padding:10px; border-radius:10px;">🔥 Shorts</div>
+        <div style="padding:10px; border-radius:10px;">📺 Suscripciones</div>
+
+        <hr style="border:1px solid #222; margin:15px 0;">
+
+        <div style="padding:10px;">📚 Biblioteca</div>
+        <div style="padding:10px;">🕒 Historial</div>
+        <div style="padding:10px;">🎵 Música</div>
+        <div style="padding:10px;">🎮 Videojuegos</div>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1; padding:20px;">
+
+        <!-- FILTERS -->
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+
+            <div style="padding:8px 14px; background-color:white; color:black; border-radius:20px; font-size:14px;">Todo</div>
+            <div style="padding:8px 14px; background-color:#272727; border-radius:20px; font-size:14px;">Música</div>
+            <div style="padding:8px 14px; background-color:#272727; border-radius:20px; font-size:14px;">Programación</div>
+            <div style="padding:8px 14px; background-color:#272727; border-radius:20px; font-size:14px;">Noticias</div>
+            <div style="padding:8px 14px; background-color:#272727; border-radius:20px; font-size:14px;">En vivo</div>
+
+        </div>
+
+        <!-- VIDEO GRID -->
+        <div style="display:flex; flex-wrap:wrap; gap:20px;">
+
+            <!-- VIDEO CARD -->
+            <div style="width:320px; cursor:pointer;">
+
+                <div style="position:relative;">
+                    <img src="https://via.placeholder.com/320x180" style="width:100%; border-radius:12px;">
+                    <div style="position:absolute; bottom:8px; right:8px; background-color:black; padding:2px 6px; font-size:12px; border-radius:4px;">
+                        12:45
+                    </div>
+                </div>
+
+                <div style="display:flex; margin-top:10px; gap:10px;">
+
+                    <div style="width:36px; height:36px; background-color:#ff0000; border-radius:50%;"></div>
+
+                    <div>
+                        <div style="font-weight:600; font-size:15px;">
+                            Aprende HTML desde CERO en 1 hora
+                        </div>
+                        <div style="color:#aaa; font-size:14px; margin-top:4px;">
+                            Code Master
+                        </div>
+                        <div style="color:#aaa; font-size:13px;">
+                            1.4M vistas • hace 1 año
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- VIDEO CARD 2 -->
+            <div style="width:320px; cursor:pointer;">
+
+                <div style="position:relative;">
+                    <img src="https://via.placeholder.com/320x180" style="width:100%; border-radius:12px;">
+                    <div style="position:absolute; bottom:8px; right:8px; background-color:black; padding:2px 6px; font-size:12px; border-radius:4px;">
+                        8:20
+                    </div>
+                </div>
+
+                <div style="display:flex; margin-top:10px; gap:10px;">
+
+                    <div style="width:36px; height:36px; background-color:#00c853; border-radius:50%;"></div>
+
+                    <div>
+                        <div style="font-weight:600; font-size:15px;">
+                            Clonando YouTube paso a paso
+                        </div>
+                        <div style="color:#aaa; font-size:14px; margin-top:4px;">
+                            Frontend Pro
+                        </div>
+                        <div style="color:#aaa; font-size:13px;">
+                            980K vistas • hace 3 meses
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- VIDEO CARD 3 -->
+            <div style="width:320px; cursor:pointer;">
+
+                <div style="position:relative;">
+                    <img src="https://via.placeholder.com/320x180" style="width:100%; border-radius:12px;">
+                    <div style="position:absolute; bottom:8px; right:8px; background-color:black; padding:2px 6px; font-size:12px; border-radius:4px;">
+                        22:10
+                    </div>
+                </div>
+
+                <div style="display:flex; margin-top:10px; gap:10px;">
+
+                    <div style="width:36px; height:36px; background-color:#3ea6ff; border-radius:50%;"></div>
+
+                    <div>
+                        <div style="font-weight:600; font-size:15px;">
+                            Proyecto profesional con HTML puro
+                        </div>
+                        <div style="color:#aaa; font-size:14px; margin-top:4px;">
+                            Dev Studio
+                        </div>
+                        <div style="color:#aaa; font-size:13px;">
+                            320K vistas • hace 2 semanas
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
